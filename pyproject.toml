@@ -1,0 +1,58 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "fl-3d-core"
+version = "0.1.0"
+description = "Federated learning core with a monitoring Flower strategy"
+requires-python = ">=3.11,<3.13"
+dependencies = [
+    "flwr[simulation]>=1.36.0",
+    "numpy>=2.0.2",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["fl_core", "fl_app"]
+
+[tool.flwr.app]
+publisher = "nhom10"
+
+[tool.flwr.app.components]
+serverapp = "fl_app.server_app:app"
+clientapp = "fl_app.client_app:app"
+
+[tool.flwr.app.config]
+num-server-rounds = 2
+lr = 0.3
+local-epochs = 3
+num-examples = 48
+event-log = "artifacts/fl_events.jsonl"
+
+
+#######################################################################
+# CONFIGURATION MIGRATION NOTICE:
+#
+# What was previously called "federation config" for SuperLink
+# connections in pyproject.toml has been renamed and moved.
+#
+# These settings are now **SuperLink connection configuration**
+# and are defined in the Flower configuration file.
+#
+# The entries below are commented out intentionally and are kept
+# only as a migration reference.
+#
+# Docs: https://flower.ai/docs/framework/ref-flower-configuration.html
+#######################################################################
+
+# [tool.flwr.federations]
+# default = "local-simulation"
+
+# [tool.flwr.federations.local-simulation]
+# options.num-supernodes = 4
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
