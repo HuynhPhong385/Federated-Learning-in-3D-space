@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "FL events",
+  "description": "JSON events for FL Backend, Middleware and 3D Frontend",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "event": {
+      "type": "string",
+      "enum": ["round_start", "client_step", "round_end"]
+    },
+    "server_round": { "type": "integer", "minimum": 1 },
+    "phase": {
+      "type": "string",
+      "enum": ["train", "evaluate", "round"]
+    },
+    "status": {
+      "type": "string",
+      "enum": ["started", "training", "uploading", "evaluating", "online", "failed", "completed"]
+    },
+    "node_id": { "type": ["integer", "null"], "minimum": 0 },
+    "metrics": { "type": "object" },
+    "timestamp": { "type": "number", "minimum": 0 },
+    "schema": { "const": "fl-event/v1" }
+  },
+  "required": [
+    "event",
+    "server_round",
+    "phase",
+    "status",
+    "node_id",
+    "metrics",
+    "timestamp",
+    "schema"
+  ],
+  "oneOf": [
+    {
+      "properties": {
+        "event": { "const": "round_start" },
+        "phase": { "const": "train" },
+        "status": { "const": "started" },
+        "node_id": { "type": "null" }
+      }
+    },
+    {
+      "properties": {
+        "event": { "const": "client_step" },
+        "phase": { "const": "train" },
+        "status": { "enum": ["training", "uploading", "failed"] },
+        "node_id": { "type": "integer" }
+      }
+    },
+    {
+      "properties": {
+        "event": { "const": "client_step" },
+        "phase": { "const": "evaluate" },
+        "status": { "enum": ["evaluating", "online", "failed"] },
+        "node_id": { "type": "integer" }
+      }
+    },
+    {
+      "properties": {
+        "event": { "const": "round_end" },
+        "phase": { "const": "round" },
+        "status": { "const": "completed" },
+        "node_id": { "type": "null" }
+      }
+    }
+  ]
+}
